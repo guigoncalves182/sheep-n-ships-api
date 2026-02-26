@@ -4,12 +4,12 @@ import {
   Headers,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DecodeToken } from '../../app/services/decode-token.service';
-import { IUserInfo } from 'src/domain/decode-tokens.interface';
+import { DecodeTokenUseCase } from '../../usecases/decode-token.usecase';
+import type { IUserInfo } from '../../domain/decode-tokens.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: DecodeToken) {}
+  constructor(private readonly decodeTokenUseCase: DecodeTokenUseCase) {}
 
   @Get('decode-token')
   async decodeToken(
@@ -21,10 +21,6 @@ export class AuthController {
 
     if (!token) throw new UnauthorizedException('Token inválido');
 
-    try {
-      return await this.authService.execute(token);
-    } catch {
-      throw new UnauthorizedException('Token do Google inválido ou expirado');
-    }
+    return await this.decodeTokenUseCase.execute(token);
   }
 }
