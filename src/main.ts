@@ -4,8 +4,14 @@ import { AppModule } from './infra/nest/modules/app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const frontendUrl = process.env.FRONTEND_URL;
+  const corsOrigin = isProduction
+    ? frontendUrl || false
+    : frontendUrl || 'http://localhost:3000';
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: corsOrigin,
     credentials: true,
   });
 
