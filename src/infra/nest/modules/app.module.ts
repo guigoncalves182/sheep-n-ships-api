@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth.module';
 import { UserModule } from './user.module';
+import { SystemController } from '../../../presentation/system/system.controller';
 
 @Module({
   imports: [
@@ -11,5 +12,6 @@ import { UserModule } from './user.module';
     AuthModule,
     UserModule,
   ],
+  controllers: [SystemController],
 })
 export class AppModule {}
