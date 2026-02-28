@@ -4,12 +4,15 @@ import {
   Headers,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DecodeTokenUseCase } from '../../usecases/decode-token.usecase';
+import { DecodeTokenService } from '../../app/services/decode-token.service';
 import type { IUserInfo } from '../../domain/decode-tokens.interface';
 
+/**
+ * TODO: remover o endpoint e usar somente o decodeTokenService diretamente nos outros usecases
+ */
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly decodeTokenUseCase: DecodeTokenUseCase) {}
+  constructor(private readonly decodeTokenService: DecodeTokenService) {}
 
   @Get('decode-token')
   async decodeToken(
@@ -21,6 +24,6 @@ export class AuthController {
 
     if (!token) throw new UnauthorizedException('Token inválido');
 
-    return await this.decodeTokenUseCase.execute(token);
+    return await this.decodeTokenService.execute(token);
   }
 }

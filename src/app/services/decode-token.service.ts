@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IUserInfo } from '../domain/decode-tokens.interface';
+import type { IUserInfo } from '../../domain/decode-tokens.interface';
 import {
   GOOGLE_USER_INFO_GATEWAY,
   type IGoogleUserInfoGateway,
-} from '../domain/gateways/google-user-info.gateway';
+} from '../../domain/gateways/google-user-info.gateway';
 
-interface IDecodeTokenUseCase {
+interface IDecodeTokenService {
   execute(token: string): Promise<IUserInfo>;
 }
 
 @Injectable()
-export class DecodeTokenUseCase implements IDecodeTokenUseCase {
+export class DecodeTokenService implements IDecodeTokenService {
   constructor(
     @Inject(GOOGLE_USER_INFO_GATEWAY)
     private readonly googleUserInfoGateway: IGoogleUserInfoGateway,

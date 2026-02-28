@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from '../../../presentation/auth/auth.controller';
 import { GOOGLE_USER_INFO_GATEWAY } from '../../../domain/gateways/google-user-info.gateway';
 import { GoogleUserInfoHttpGateway } from '../../google/google-user-info-http.gateway';
-import { DecodeTokenUseCase } from '../../../usecases/decode-token.usecase';
+import { DecodeTokenService } from '../../../app/services/decode-token.service';
 
 @Module({
   imports: [],
@@ -13,8 +13,8 @@ import { DecodeTokenUseCase } from '../../../usecases/decode-token.usecase';
       provide: GOOGLE_USER_INFO_GATEWAY,
       useExisting: GoogleUserInfoHttpGateway,
     },
-    DecodeTokenUseCase,
+    DecodeTokenService,
   ],
-  exports: [DecodeTokenUseCase],
+  exports: [DecodeTokenService],
 })
 export class AuthModule {}
