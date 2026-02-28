@@ -66,6 +66,11 @@ export default tseslint.config(
         {
           selector: 'property',
           format: ['camelCase', 'snake_case', 'PascalCase'],
+          filter: {
+            // Permite propriedades do MongoDB que começam com _
+            regex: '^_',
+            match: false,
+          },
         },
         // Métodos em camelCase
         {
