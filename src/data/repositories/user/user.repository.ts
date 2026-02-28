@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import type { IUserCurrency } from '../../domain/currency.interface';
-import { Currency } from '../schemas/currency.schema';
+import { Currency } from '../../schemas/currency.schema';
+import type { IUserCurrency } from '../../../domain/currency.interface';
 
 interface IAddCurrencyParams {
   userId: string;

@@ -1,5 +1,5 @@
 import { Controller, Get, Headers } from '@nestjs/common';
-import { GetUserCurrencyUseCase } from '../../usecases/get-user-currency.usecase';
+import { GetUserCurrencyUseCase } from '../../usecases/get-user-currency/get-user-currency.usecase';
 import type { IUserCurrency } from '../../domain/currency.interface';
 
 @Controller('user')

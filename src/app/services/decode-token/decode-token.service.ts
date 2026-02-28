@@ -1,9 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IUserInfo } from '../../domain/decode-tokens.interface';
-import {
-  GOOGLE_USER_INFO_GATEWAY,
-  type IGoogleUserInfoGateway,
-} from '../../domain/gateways/google-user-info.gateway';
+import type { IUserInfo } from '../../../domain/decode-tokens.interface';
+import { GOOGLE_USER_INFO_GATEWAY } from '../../../domain/gateways/google-user-info.gateway';
+import type { IGoogleUserInfoGateway } from '../../../domain/gateways/google-user-info.gateway';
 
 interface IDecodeTokenService {
   execute(token: string): Promise<IUserInfo>;

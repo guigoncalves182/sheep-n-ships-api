@@ -5,9 +5,9 @@ import {
   CURRENCY_SCHEMA,
 } from '../../../data/schemas/currency.schema';
 import { UserController } from '../../../presentation/user/user.controller';
-import { GetUserCurrencyUseCase } from '../../../usecases/get-user-currency.usecase';
-import { UserRepository } from '../../../data/repositories/user.repository';
+import { GetUserCurrencyUseCase } from '../../../usecases/get-user-currency/get-user-currency.usecase';
 import { AuthModule } from './auth.module';
+import { UserRepository } from 'src/data/repositories/user/user.repository';
 
 @Module({
   imports: [
