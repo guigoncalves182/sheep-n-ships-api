@@ -4,10 +4,13 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { UserController } from './user.controller';
 import { GetUserCurrencyUseCase } from '../../usecases/get-user-currency/get-user-currency.usecase';
+import { GetUserOrdersUseCase } from '../../usecases/get-user-orders/get-user-orders.usecase';
+import { EOrderType } from '../../data/schemas/order.schema';
 
 describe('UserController', () => {
   let app: INestApplication;
-  const execute = jest.fn();
+  const executeCurrency = jest.fn();
+  const executeOrders = jest.fn();
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -15,7 +18,11 @@ describe('UserController', () => {
       providers: [
         {
           provide: GetUserCurrencyUseCase,
-          useValue: { execute },
+          useValue: { execute: executeCurrency },
+        },
+        {
+          provide: GetUserOrdersUseCase,
+          useValue: { execute: executeOrders },
         },
       ],
     }).compile();
@@ -33,7 +40,7 @@ describe('UserController', () => {
   });
 
   it('GET /user/currency should call use case with bearer token and return payload', async () => {
-    execute.mockResolvedValue({ userId: 'user-1', chip: 12, cash: 8 });
+    executeCurrency.mockResolvedValue({ userId: 'user-1', chip: 12, cash: 8 });
     const httpServer = app.getHttpServer() as App;
 
     const response = await request(httpServer)
@@ -41,16 +48,52 @@ describe('UserController', () => {
       .set('authorization', 'Bearer token-abc')
       .expect(200);
 
-    expect(execute).toHaveBeenCalledWith('token-abc');
+    expect(executeCurrency).toHaveBeenCalledWith('token-abc');
     expect(response.body).toEqual({ userId: 'user-1', chip: 12, cash: 8 });
   });
 
   it('GET /user/currency should call use case with undefined token when header is missing', async () => {
-    execute.mockResolvedValue({ userId: 'user-1', chip: 0, cash: 0 });
+    executeCurrency.mockResolvedValue({ userId: 'user-1', chip: 0, cash: 0 });
     const httpServer = app.getHttpServer() as App;
 
     await request(httpServer).get('/user/currency').expect(200);
 
-    expect(execute).toHaveBeenCalledWith(undefined);
+    expect(executeCurrency).toHaveBeenCalledWith(undefined);
+  });
+
+  it('GET /user/orders should call use case with bearer token and return payload', async () => {
+    executeOrders.mockResolvedValue([
+      {
+        userId: 'user-1',
+        type: EOrderType.Sheep,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        fulfilledAt: '2026-01-01T01:00:00.000Z',
+      },
+    ]);
+    const httpServer = app.getHttpServer() as App;
+
+    const response = await request(httpServer)
+      .get('/user/orders')
+      .set('authorization', 'Bearer token-orders')
+      .expect(200);
+
+    expect(executeOrders).toHaveBeenCalledWith('token-orders');
+    expect(response.body).toEqual([
+      {
+        userId: 'user-1',
+        type: EOrderType.Sheep,
+        createdAt: '2026-01-01T00:00:00.000Z',
+        fulfilledAt: '2026-01-01T01:00:00.000Z',
+      },
+    ]);
+  });
+
+  it('GET /user/orders should call use case with undefined token when header is missing', async () => {
+    executeOrders.mockResolvedValue([]);
+    const httpServer = app.getHttpServer() as App;
+
+    await request(httpServer).get('/user/orders').expect(200);
+
+    expect(executeOrders).toHaveBeenCalledWith(undefined);
   });
 });
