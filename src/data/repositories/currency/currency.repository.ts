@@ -20,7 +20,7 @@ export class CurrencyRepository {
   async getUserCurrency(userId: string): Promise<IUserCurrency | null> {
     const currency = await this.currencyModel
       .findOne({ userId })
-      .select({ _id: 0, userId: 1, chip: 1, cash: 1 })
+      .select({ _id: 1, userId: 1, chip: 1, cash: 1 })
       .lean<Currency>()
       .exec();
 
