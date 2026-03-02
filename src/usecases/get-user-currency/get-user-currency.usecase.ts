@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { IUserCurrency } from '../../domain/currency.interface';
 import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
-import { UserRepository } from '../../data/repositories/user/user.repository';
+import { CurrencyRepository } from '../../data/repositories/currency/currency.repository';
 
 interface IGetUserCurrencyUseCase {
   execute(token: string): Promise<IUserCurrency>;
@@ -10,7 +10,7 @@ interface IGetUserCurrencyUseCase {
 @Injectable()
 export class GetUserCurrencyUseCase implements IGetUserCurrencyUseCase {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: CurrencyRepository,
     private readonly decodeTokenService: DecodeTokenService,
   ) {}
 
@@ -19,7 +19,7 @@ export class GetUserCurrencyUseCase implements IGetUserCurrencyUseCase {
     let currency = await this.userRepository.getUserCurrency(userId);
 
     if (!currency) {
-      currency = await this.userRepository.addUserCurrency({
+      currency = await this.userRepository.addCurrencyToUser({
         userId,
         chip: 0,
         cash: 0,

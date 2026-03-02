@@ -11,7 +11,7 @@ interface IAddCurrencyParams {
 }
 
 @Injectable()
-export class UserRepository {
+export class CurrencyRepository {
   constructor(
     @InjectModel(Currency.name)
     private readonly currencyModel: Model<Currency>,
@@ -35,7 +35,7 @@ export class UserRepository {
     };
   }
 
-  async addUserCurrency(params: IAddCurrencyParams): Promise<IUserCurrency> {
+  async addCurrencyToUser(params: IAddCurrencyParams): Promise<IUserCurrency> {
     const userId: string = params.userId;
     const chip: number = params.chip ?? 0;
     const cash: number = params.cash ?? 0;

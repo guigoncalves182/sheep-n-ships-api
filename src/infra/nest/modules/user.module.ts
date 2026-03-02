@@ -7,7 +7,7 @@ import {
 import { UserController } from '../../../presentation/user/user.controller';
 import { GetUserCurrencyUseCase } from '../../../usecases/get-user-currency/get-user-currency.usecase';
 import { AuthModule } from './auth.module';
-import { UserRepository } from 'src/data/repositories/user/user.repository';
+import { CurrencyRepository } from 'src/data/repositories/currency/currency.repository';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { UserRepository } from 'src/data/repositories/user/user.repository';
     AuthModule,
   ],
   controllers: [UserController],
-  providers: [UserRepository, GetUserCurrencyUseCase],
+  providers: [CurrencyRepository, GetUserCurrencyUseCase],
   exports: [GetUserCurrencyUseCase],
 })
 export class UserModule {}

@@ -1,16 +1,16 @@
 import { BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Currency } from '../../schemas/currency.schema';
-import { UserRepository } from './user.repository';
+import { CurrencyRepository } from './currency.repository';
 
-describe('UserRepository', () => {
+describe('CurrencyRepository', () => {
   const exec = jest.fn();
   const lean = jest.fn();
   const select = jest.fn();
   const findOne = jest.fn();
   const findOneAndUpdate = jest.fn();
 
-  let repository: UserRepository;
+  let repository: CurrencyRepository;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -19,7 +19,7 @@ describe('UserRepository', () => {
     select.mockReturnValue({ lean });
     findOne.mockReturnValue({ select });
 
-    repository = new UserRepository({
+    repository = new CurrencyRepository({
       findOne,
       findOneAndUpdate,
     } as unknown as Model<Currency>);
@@ -50,10 +50,10 @@ describe('UserRepository', () => {
     });
   });
 
-  describe('addUserCurrency', () => {
+  describe('addCurrencyToUser', () => {
     it('should throw when chip or cash is negative', async () => {
       await expect(
-        repository.addUserCurrency({ userId: 'user-1', chip: -1, cash: 0 }),
+        repository.addCurrencyToUser({ userId: 'user-1', chip: -1, cash: 0 }),
       ).rejects.toBeInstanceOf(BadRequestException);
 
       expect(findOneAndUpdate).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('UserRepository', () => {
         cash: 5,
       } as Currency);
 
-      const result = await repository.addUserCurrency({
+      const result = await repository.addCurrencyToUser({
         userId: 'user-1',
         chip: 15,
         cash: 5,
@@ -90,7 +90,7 @@ describe('UserRepository', () => {
         cash: 0,
       } as Currency);
 
-      const result = await repository.addUserCurrency({ userId: 'user-2' });
+      const result = await repository.addCurrencyToUser({ userId: 'user-2' });
 
       expect(findOneAndUpdate).toHaveBeenCalledWith(
         { userId: 'user-2' },
