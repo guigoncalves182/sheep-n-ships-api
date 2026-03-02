@@ -33,7 +33,7 @@ describe('CurrencyRepository', () => {
 
       expect(findOne).toHaveBeenCalledWith({ userId: 'user-1' });
       expect(select).toHaveBeenCalledWith({
-        _id: 0,
+        _id: 1,
         userId: 1,
         chip: 1,
         cash: 1,
