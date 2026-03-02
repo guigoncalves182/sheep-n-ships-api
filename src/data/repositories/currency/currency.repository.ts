@@ -28,11 +28,7 @@ export class CurrencyRepository {
       return null;
     }
 
-    return {
-      userId: currency.userId,
-      chip: currency.chip,
-      cash: currency.cash,
-    };
+    return currency;
   }
 
   async addCurrencyToUser(params: IAddCurrencyParams): Promise<IUserCurrency> {
@@ -54,10 +50,6 @@ export class CurrencyRepository {
       { upsert: true, new: true },
     );
 
-    return {
-      userId: updated.userId,
-      chip: updated.chip,
-      cash: updated.cash,
-    };
+    return updated;
   }
 }
