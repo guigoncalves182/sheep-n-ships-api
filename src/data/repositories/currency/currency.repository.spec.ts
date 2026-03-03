@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Currency } from '../../schemas/currency.schema';
 import { CurrencyRepository } from './currency.repository';
@@ -51,12 +50,28 @@ describe('CurrencyRepository', () => {
   });
 
   describe('addCurrencyToUser', () => {
-    it('should throw when chip or cash is negative', async () => {
-      await expect(
-        repository.addCurrencyToUser({ userId: 'user-1', chip: -1, cash: 0 }),
-      ).rejects.toBeInstanceOf(BadRequestException);
+    it('should allow negative values to decrement chip and cash', async () => {
+      findOneAndUpdate.mockResolvedValue({
+        userId: 'user-1',
+        chip: 9,
+        cash: 3,
+      } as Currency);
 
-      expect(findOneAndUpdate).not.toHaveBeenCalled();
+      const result = await repository.incrementUserCurrency({
+        userId: 'user-1',
+        chip: -1,
+        cash: -2,
+      });
+
+      expect(findOneAndUpdate).toHaveBeenCalledWith(
+        { userId: 'user-1' },
+        {
+          $inc: { chip: -1, cash: -2 },
+          $setOnInsert: { userId: 'user-1' },
+        },
+        { upsert: true, returnDocument: 'after' },
+      );
+      expect(result).toEqual({ userId: 'user-1', chip: 9, cash: 3 });
     });
 
     it('should upsert and return mapped currency', async () => {
@@ -66,7 +81,7 @@ describe('CurrencyRepository', () => {
         cash: 5,
       } as Currency);
 
-      const result = await repository.addCurrencyToUser({
+      const result = await repository.incrementUserCurrency({
         userId: 'user-1',
         chip: 15,
         cash: 5,
@@ -78,7 +93,7 @@ describe('CurrencyRepository', () => {
           $inc: { chip: 15, cash: 5 },
           $setOnInsert: { userId: 'user-1' },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       );
       expect(result).toEqual({ userId: 'user-1', chip: 15, cash: 5 });
     });
@@ -90,7 +105,9 @@ describe('CurrencyRepository', () => {
         cash: 0,
       } as Currency);
 
-      const result = await repository.addCurrencyToUser({ userId: 'user-2' });
+      const result = await repository.incrementUserCurrency({
+        userId: 'user-2',
+      });
 
       expect(findOneAndUpdate).toHaveBeenCalledWith(
         { userId: 'user-2' },
@@ -98,7 +115,7 @@ describe('CurrencyRepository', () => {
           $inc: { chip: 0, cash: 0 },
           $setOnInsert: { userId: 'user-2' },
         },
-        { upsert: true, new: true },
+        { upsert: true, returnDocument: 'after' },
       );
       expect(result).toEqual({ userId: 'user-2', chip: 0, cash: 0 });
     });

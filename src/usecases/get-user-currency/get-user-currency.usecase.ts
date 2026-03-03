@@ -10,16 +10,16 @@ interface IGetUserCurrencyUseCase {
 @Injectable()
 export class GetUserCurrencyUseCase implements IGetUserCurrencyUseCase {
   constructor(
-    private readonly userRepository: CurrencyRepository,
+    private readonly currencyRepository: CurrencyRepository,
     private readonly decodeTokenService: DecodeTokenService,
   ) {}
 
   async execute(token: string): Promise<IUserCurrency> {
     const { id: userId } = await this.decodeTokenService.execute(token);
-    let currency = await this.userRepository.getUserCurrency(userId);
+    let currency = await this.currencyRepository.getUserCurrency(userId);
 
     if (!currency) {
-      currency = await this.userRepository.addCurrencyToUser({
+      currency = await this.currencyRepository.incrementUserCurrency({
         userId,
         chip: 0,
         cash: 0,

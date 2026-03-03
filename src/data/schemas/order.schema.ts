@@ -14,10 +14,10 @@ export class Order {
   type: EOrderType;
 
   @Prop({ required: true })
-  createdAt: string;
+  createdAt: Date;
 
   @Prop({ required: true })
-  fulfilledAt: string;
+  fulfilledAt: Date;
 }
 
 export const ORDER_SCHEMA = SchemaFactory.createForClass(Order);

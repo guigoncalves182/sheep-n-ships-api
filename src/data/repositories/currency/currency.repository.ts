@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Currency } from '../../schemas/currency.schema';
 import type { IUserCurrency } from '../../../domain/currency.interface';
 
-interface IAddCurrencyParams {
+interface IIncrementUserCurrency {
   userId: string;
   chip?: number;
   cash?: number;
@@ -31,15 +31,12 @@ export class CurrencyRepository {
     return currency;
   }
 
-  async addCurrencyToUser(params: IAddCurrencyParams): Promise<IUserCurrency> {
+  async incrementUserCurrency(
+    params: IIncrementUserCurrency,
+  ): Promise<IUserCurrency> {
     const userId: string = params.userId;
     const chip: number = params.chip ?? 0;
     const cash: number = params.cash ?? 0;
-
-    if (chip < 0 || cash < 0)
-      throw new BadRequestException(
-        'Chip and cash values must be positive numbers',
-      );
 
     const updated = await this.currencyModel.findOneAndUpdate(
       { userId },
@@ -47,7 +44,7 @@ export class CurrencyRepository {
         $inc: { chip, cash },
         $setOnInsert: { userId },
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: 'after' },
     );
 
     return updated;

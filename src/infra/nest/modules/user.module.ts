@@ -8,6 +8,7 @@ import { Order, ORDER_SCHEMA } from '../../../data/schemas/order.schema';
 import { UserController } from '../../../presentation/user/user.controller';
 import { GetUserCurrencyUseCase } from '../../../usecases/get-user-currency/get-user-currency.usecase';
 import { GetUserOrdersUseCase } from '../../../usecases/get-user-orders/get-user-orders.usecase';
+import { CreateSheepOrder } from '../../../usecases/create-sheep-order/create-sheep-order';
 import { AuthModule } from './auth.module';
 import { CurrencyRepository } from 'src/data/repositories/currency/currency.repository';
 import { OrderRepository } from 'src/data/repositories/order/order.repository';
@@ -26,6 +27,7 @@ import { OrderRepository } from 'src/data/repositories/order/order.repository';
     OrderRepository,
     GetUserCurrencyUseCase,
     GetUserOrdersUseCase,
+    CreateSheepOrder,
   ],
   exports: [GetUserCurrencyUseCase, GetUserOrdersUseCase],
 })

@@ -4,7 +4,7 @@ import { CurrencyRepository } from '../../data/repositories/currency/currency.re
 
 describe('GetUserCurrencyUseCase', () => {
   const getUserCurrency = jest.fn();
-  const addCurrencyToUser = jest.fn();
+  const incrementUserCurrency = jest.fn();
   const decodeExecute = jest.fn();
 
   let useCase: GetUserCurrencyUseCase;
@@ -15,7 +15,7 @@ describe('GetUserCurrencyUseCase', () => {
     useCase = new GetUserCurrencyUseCase(
       {
         getUserCurrency,
-        addCurrencyToUser,
+        incrementUserCurrency,
       } as unknown as CurrencyRepository,
       { execute: decodeExecute } as unknown as DecodeTokenService,
     );
@@ -33,19 +33,23 @@ describe('GetUserCurrencyUseCase', () => {
 
     expect(decodeExecute).toHaveBeenCalledWith('token-1');
     expect(getUserCurrency).toHaveBeenCalledWith('user-1');
-    expect(addCurrencyToUser).not.toHaveBeenCalled();
+    expect(incrementUserCurrency).not.toHaveBeenCalled();
     expect(result).toEqual({ userId: 'user-1', chip: 100, cash: 50 });
   });
 
   it('should create currency when user has no currency yet', async () => {
     decodeExecute.mockResolvedValue({ id: 'user-2' });
     getUserCurrency.mockResolvedValue(null);
-    addCurrencyToUser.mockResolvedValue({ userId: 'user-2', chip: 0, cash: 0 });
+    incrementUserCurrency.mockResolvedValue({
+      userId: 'user-2',
+      chip: 0,
+      cash: 0,
+    });
 
     const result = await useCase.execute('token-2');
 
     expect(getUserCurrency).toHaveBeenCalledWith('user-2');
-    expect(addCurrencyToUser).toHaveBeenCalledWith({
+    expect(incrementUserCurrency).toHaveBeenCalledWith({
       userId: 'user-2',
       chip: 0,
       cash: 0,

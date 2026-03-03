@@ -7,6 +7,7 @@ describe('OrderRepository', () => {
   const lean = jest.fn();
   const select = jest.fn();
   const find = jest.fn();
+  const create = jest.fn();
 
   let repository: OrderRepository;
 
@@ -17,7 +18,12 @@ describe('OrderRepository', () => {
     select.mockReturnValue({ lean });
     find.mockReturnValue({ select });
 
-    repository = new OrderRepository({ find } as unknown as Model<Order>);
+    const orderModel = {
+      find,
+      create,
+    } as unknown as Model<Order>;
+
+    repository = new OrderRepository(orderModel);
   });
 
   it('should query user orders and return mapped response', async () => {
@@ -34,7 +40,7 @@ describe('OrderRepository', () => {
 
     expect(find).toHaveBeenCalledWith({ userId: 'user-1' });
     expect(select).toHaveBeenCalledWith({
-      _id: 0,
+      _id: 1,
       userId: 1,
       type: 1,
       createdAt: 1,
@@ -50,5 +56,29 @@ describe('OrderRepository', () => {
     const result = await repository.getUserOrders('unknown-user');
 
     expect(result).toEqual([]);
+  });
+
+  it('should create order and return payload with userId', async () => {
+    const createdAt = new Date('2026-01-01T00:00:00.000Z');
+    const fulfilledAt = new Date('2026-01-01T01:00:00.000Z');
+
+    create.mockResolvedValue({
+      userId: 'user-1',
+      type: EOrderType.Ship,
+      createdAt,
+      fulfilledAt,
+    });
+
+    const result = await repository.createOrder({
+      userId: 'user-1',
+      type: EOrderType.Ship,
+      fulfilledAt,
+    });
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(result.type).toBe(EOrderType.Ship);
+    expect(result.createdAt).toBe(createdAt);
+    expect(result.fulfilledAt).toBe(fulfilledAt);
+    expect(result.userId).toBe('user-1');
   });
 });
