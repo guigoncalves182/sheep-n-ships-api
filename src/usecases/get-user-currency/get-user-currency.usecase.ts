@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { IUserCurrency } from '../../domain/currency.interface';
 import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
 import { CurrencyRepository } from '../../data/repositories/currency/currency.repository';
-import { CONFIGURATIONS } from 'src/domain/constants/configurations.constants';
+import { CONFIGURATIONS } from '../../domain/constants/configurations.constants';
 
 interface IGetUserCurrencyUseCase {
   execute(token: string): Promise<IUserCurrency>;

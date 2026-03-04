@@ -42,8 +42,8 @@ describe('GetUserCurrencyUseCase', () => {
     getUserCurrency.mockResolvedValue(null);
     incrementUserCurrency.mockResolvedValue({
       userId: 'user-2',
-      chip: 0,
-      cash: 0,
+      chip: 500,
+      cash: 50,
     });
 
     const result = await useCase.execute('token-2');
@@ -51,9 +51,9 @@ describe('GetUserCurrencyUseCase', () => {
     expect(getUserCurrency).toHaveBeenCalledWith('user-2');
     expect(incrementUserCurrency).toHaveBeenCalledWith({
       userId: 'user-2',
-      chip: 0,
-      cash: 0,
+      chip: 500,
+      cash: 50,
     });
-    expect(result).toEqual({ userId: 'user-2', chip: 0, cash: 0 });
+    expect(result).toEqual({ userId: 'user-2', chip: 500, cash: 50 });
   });
 });
