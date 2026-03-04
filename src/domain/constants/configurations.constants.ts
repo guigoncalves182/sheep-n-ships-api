@@ -30,9 +30,19 @@ export interface ISheepGenerationConfig {
   statConfig: IStatConfig;
 }
 
+export interface IInitialCurrencyConfig {
+  chip: number;
+  cash: number;
+}
+
+export interface IUserConfig {
+  initialCurrency: IInitialCurrencyConfig;
+}
+
 export interface IConfigurations {
   costs: ICostConfig;
   sheepGeneration: ISheepGenerationConfig;
+  user: IUserConfig;
 }
 
 export const CONFIGURATIONS: IConfigurations = {
@@ -57,6 +67,12 @@ export const CONFIGURATIONS: IConfigurations = {
     statConfig: {
       minStatTotal: 500,
       maxStatTotal: 2500,
+    },
+  },
+  user: {
+    initialCurrency: {
+      chip: 500,
+      cash: 50,
     },
   },
 };
