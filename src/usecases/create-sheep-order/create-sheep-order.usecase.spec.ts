@@ -1,9 +1,9 @@
+import { EOrderType } from '../../domain/order.interface';
 import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
 import { CurrencyRepository } from '../../data/repositories/currency/currency.repository';
 import { OrderRepository } from '../../data/repositories/order/order.repository';
-import { EOrderType } from '../../data/schemas/order.schema';
 import { GetUserCurrencyUseCase } from '../get-user-currency/get-user-currency.usecase';
-import { CreateSheepOrder } from './create-sheep-order';
+import { CreateSheepOrderUseCase } from './create-sheep-order.usecase';
 import { BadRequestException } from '@nestjs/common';
 
 describe('CreateSheepOrder', () => {
@@ -12,12 +12,12 @@ describe('CreateSheepOrder', () => {
   const incrementUserCurrency = jest.fn();
   const getUserCurrencyExecute = jest.fn();
 
-  let useCase: CreateSheepOrder;
+  let useCase: CreateSheepOrderUseCase;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    useCase = new CreateSheepOrder(
+    useCase = new CreateSheepOrderUseCase(
       { execute: decodeExecute } as unknown as DecodeTokenService,
       { createOrder } as unknown as OrderRepository,
       { incrementUserCurrency } as unknown as CurrencyRepository,

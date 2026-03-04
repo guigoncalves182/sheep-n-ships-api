@@ -1,13 +1,17 @@
 import { Model } from 'mongoose';
-import { EOrderType, Order } from '../../schemas/order.schema';
+import { Order } from '../../schemas/order.schema';
 import { OrderRepository } from './order.repository';
+import { EOrderType } from '../../../domain/order.interface';
 
 describe('OrderRepository', () => {
   const exec = jest.fn();
   const lean = jest.fn();
   const select = jest.fn();
+  const session = jest.fn();
   const find = jest.fn();
   const create = jest.fn();
+  const findByIdAndDelete = jest.fn();
+  const findById = jest.fn();
 
   let repository: OrderRepository;
 
@@ -16,11 +20,16 @@ describe('OrderRepository', () => {
 
     lean.mockReturnValue({ exec });
     select.mockReturnValue({ lean });
+    session.mockReturnValue({ exec });
     find.mockReturnValue({ select });
+    findByIdAndDelete.mockReturnValue({ session });
+    findById.mockReturnValue({ lean });
 
     const orderModel = {
       find,
       create,
+      findByIdAndDelete,
+      findById,
     } as unknown as Model<Order>;
 
     repository = new OrderRepository(orderModel);
@@ -80,5 +89,50 @@ describe('OrderRepository', () => {
     expect(result.createdAt).toBe(createdAt);
     expect(result.fulfilledAt).toBe(fulfilledAt);
     expect(result.userId).toBe('user-1');
+  });
+
+  it('should remove order by id', async () => {
+    exec.mockResolvedValue(null);
+
+    await repository.removeOrderById('order-1');
+
+    expect(findByIdAndDelete).toHaveBeenCalledWith('order-1');
+    expect(session).toHaveBeenCalledWith(null);
+    expect(exec).toHaveBeenCalledTimes(1);
+  });
+
+  it('should remove order by id with session', async () => {
+    const mongoSession = {} as any;
+    exec.mockResolvedValue(null);
+
+    await repository.removeOrderById('order-1', mongoSession);
+
+    expect(findByIdAndDelete).toHaveBeenCalledWith('order-1');
+    expect(session).toHaveBeenCalledWith(mongoSession);
+    expect(exec).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return order when found by id', async () => {
+    const order = {
+      userId: 'user-1',
+      type: EOrderType.Sheep,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      fulfilledAt: new Date('2026-01-01T01:00:00.000Z'),
+    };
+    exec.mockResolvedValue(order);
+
+    const result = await repository.getOrderById('order-1');
+
+    expect(findById).toHaveBeenCalledWith('order-1');
+    expect(result).toEqual(order);
+  });
+
+  it('should return null when order is not found by id', async () => {
+    exec.mockResolvedValue(null);
+
+    const result = await repository.getOrderById('non-existent');
+
+    expect(findById).toHaveBeenCalledWith('non-existent');
+    expect(result).toBeNull();
   });
 });

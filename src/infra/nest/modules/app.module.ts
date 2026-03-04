@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth.module';
 import { UserModule } from './user.module';
 import { SystemController } from '../../../presentation/system/system.controller';
+import { SheepModule } from './sheep.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { SystemController } from '../../../presentation/system/system.controller
     MongooseModule.forRoot(process.env.MONGO_DB_CONNECTION_STRING ?? ''),
     AuthModule,
     UserModule,
+    SheepModule,
   ],
   controllers: [SystemController],
 })

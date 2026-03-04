@@ -1,4 +1,7 @@
-import { EOrderType } from '../data/schemas/order.schema';
+export enum EOrderType {
+  Sheep = 'Sheep',
+  Ship = 'Ship',
+}
 
 export interface IUserOrder {
   userId: string;

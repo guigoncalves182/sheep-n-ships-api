@@ -5,8 +5,8 @@ import type { App } from 'supertest/types';
 import { UserController } from './user.controller';
 import { GetUserCurrencyUseCase } from '../../usecases/get-user-currency/get-user-currency.usecase';
 import { GetUserOrdersUseCase } from '../../usecases/get-user-orders/get-user-orders.usecase';
-import { CreateSheepOrder } from '../../usecases/create-sheep-order/create-sheep-order';
-import { EOrderType } from '../../data/schemas/order.schema';
+import { CreateSheepOrderUseCase } from '../../usecases/create-sheep-order/create-sheep-order.usecase';
+import { EOrderType } from '../../domain/order.interface';
 
 describe('UserController', () => {
   let app: INestApplication;
@@ -27,7 +27,7 @@ describe('UserController', () => {
           useValue: { execute: executeOrders },
         },
         {
-          provide: CreateSheepOrder,
+          provide: CreateSheepOrderUseCase,
           useValue: { execute: executeCreateSheepOrder },
         },
       ],

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-export enum EOrderType {
+enum EOrderType {
   Sheep = 'Sheep',
   Ship = 'Ship',
 }

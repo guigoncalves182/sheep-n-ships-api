@@ -3,14 +3,14 @@ import { GetUserCurrencyUseCase } from '../../usecases/get-user-currency/get-use
 import type { IUserCurrency } from '../../domain/currency.interface';
 import { GetUserOrdersUseCase } from '../../usecases/get-user-orders/get-user-orders.usecase';
 import type { IUserOrder } from '../../domain/order.interface';
-import { CreateSheepOrder } from '../../usecases/create-sheep-order/create-sheep-order';
+import { CreateSheepOrderUseCase } from '../../usecases/create-sheep-order/create-sheep-order.usecase';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly getUserCurrencyUseCase: GetUserCurrencyUseCase,
     private readonly getUserOrdersUseCase: GetUserOrdersUseCase,
-    private readonly createSheepOrderUseCase: CreateSheepOrder,
+    private readonly createSheepOrderUseCase: CreateSheepOrderUseCase,
   ) {}
 
   @Get('currency')

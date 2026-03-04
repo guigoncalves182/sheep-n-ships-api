@@ -1,6 +1,6 @@
+import { EOrderType } from '../../domain/order.interface';
 import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
 import { OrderRepository } from '../../data/repositories/order/order.repository';
-import { EOrderType } from '../../data/schemas/order.schema';
 import { GetUserOrdersUseCase } from './get-user-orders.usecase';
 
 describe('GetUserOrdersUseCase', () => {

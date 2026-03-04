@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { EOrderType, Order } from '../../schemas/order.schema';
-import type { IUserOrder } from '../../../domain/order.interface';
+import { ClientSession, Model } from 'mongoose';
+import type { EOrderType, IUserOrder } from '../../../domain/order.interface';
+import { Order } from '../../schemas/order.schema';
 
 interface ICreateOrderParams {
   userId: string;
@@ -37,6 +37,25 @@ export class OrderRepository {
       createdAt: new Date(),
       fulfilledAt,
     });
+
+    return order;
+  }
+
+  async removeOrderById(
+    orderId: string,
+    session?: ClientSession,
+  ): Promise<void> {
+    await this.orderModel
+      .findByIdAndDelete(orderId)
+      .session(session ?? null)
+      .exec();
+  }
+
+  async getOrderById(orderId: string): Promise<IUserOrder | null> {
+    const order = await this.orderModel
+      .findById(orderId)
+      .lean<IUserOrder>()
+      .exec();
 
     return order;
   }
