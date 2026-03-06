@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Model } from 'mongoose';
 import { Order } from '../../schemas/order.schema';
 import { OrderRepository } from './order.repository';

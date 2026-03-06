@@ -139,7 +139,6 @@ describe('GenerateSheepService', () => {
 
     describe('stat disparity', () => {
       it('should distribute stats equally when statDisparityRate is 0', async () => {
-        const roll = 60;
         let callCount = 0;
         jest.spyOn(Math, 'random').mockImplementation(() => {
           if (callCount++ === 0) return 0.6; // roll = Math.floor(0.6 * 100) = 60
