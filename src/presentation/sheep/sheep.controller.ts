@@ -11,8 +11,11 @@ export class SheepController {
   ) {}
 
   @Get()
-  async getUserSheeps(): Promise<IUserSheep[]> {
-    return await this.getUserSheepsUseCase.execute();
+  async getUserSheeps(
+    @Headers('authorization') authorization: string,
+  ): Promise<IUserSheep[]> {
+    const token = authorization?.replace('Bearer ', '');
+    return await this.getUserSheepsUseCase.execute(token);
   }
 
   @Post('claim/:orderId')

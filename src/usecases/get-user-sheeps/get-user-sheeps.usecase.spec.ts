@@ -1,22 +1,27 @@
 import { SheepRepository } from '../../data/repositories/sheep/sheep.repository';
 import { ERarity } from '../../domain/sheep.interface';
 import { GetUserSheepsUseCase } from './get-user-sheeps.usecase';
+import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
 
 describe('GetUserSheepsUseCase', () => {
-  const getAllSheeps = jest.fn();
+  const getUserSheeps = jest.fn();
+  const decodeExecute = jest.fn();
 
   let useCase: GetUserSheepsUseCase;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    useCase = new GetUserSheepsUseCase({
-      getAllSheeps,
-    } as unknown as SheepRepository);
+    useCase = new GetUserSheepsUseCase(
+      {
+        getUserSheeps,
+      } as unknown as SheepRepository,
+      { execute: decodeExecute } as unknown as DecodeTokenService,
+    );
   });
 
   it('should return all sheeps', async () => {
-    getAllSheeps.mockResolvedValue([
+    getUserSheeps.mockResolvedValue([
       {
         userId: 'user-1',
         rarity: ERarity.Common,
@@ -39,19 +44,25 @@ describe('GetUserSheepsUseCase', () => {
       },
     ]);
 
-    const result = await useCase.execute();
+    decodeExecute.mockResolvedValue({ id: 'user-2' });
 
-    expect(getAllSheeps).toHaveBeenCalledTimes(1);
+    const result = await useCase.execute('user-2');
+
+    expect(decodeExecute).toHaveBeenCalledTimes(1);
+    expect(getUserSheeps).toHaveBeenCalledTimes(1);
     expect(result).toHaveLength(2);
     expect(result[1]?.rarity).toBe(ERarity.Rare);
   });
 
   it('should return empty array when there are no sheeps', async () => {
-    getAllSheeps.mockResolvedValue([]);
+    getUserSheeps.mockResolvedValue([]);
 
-    const result = await useCase.execute();
+    decodeExecute.mockResolvedValue({ id: 'user-1' });
 
-    expect(getAllSheeps).toHaveBeenCalledTimes(1);
+    const result = await useCase.execute('user-1');
+
+    expect(decodeExecute).toHaveBeenCalledTimes(1);
+    expect(getUserSheeps).toHaveBeenCalledTimes(1);
     expect(result).toEqual([]);
   });
 });
