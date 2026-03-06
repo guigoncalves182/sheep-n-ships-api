@@ -5,6 +5,9 @@ import { OrderRepository } from '../../data/repositories/order/order.repository'
 import { GetUserCurrencyUseCase } from '../get-user-currency/get-user-currency.usecase';
 import { CreateSheepOrderUseCase } from './create-sheep-order.usecase';
 import { BadRequestException } from '@nestjs/common';
+import { CONFIGURATIONS } from '../../domain/constants/configurations.constants';
+
+const BASE_TIME_MS = CONFIGURATIONS.costs.orders.sheep.time * 60 * 1000;
 
 describe('CreateSheepOrder', () => {
   const createOrder = jest.fn();
@@ -41,7 +44,7 @@ describe('CreateSheepOrder', () => {
       userId: 'user-1',
       type: EOrderType.Sheep,
       createdAt: new Date(fixedNow),
-      fulfilledAt: new Date(fixedNow + 30 * 60 * 1000),
+      fulfilledAt: new Date(fixedNow + BASE_TIME_MS * 2),
     });
 
     const result = await useCase.execute('token-1');
@@ -55,7 +58,7 @@ describe('CreateSheepOrder', () => {
     expect(createOrder).toHaveBeenCalledWith({
       userId: 'user-1',
       type: EOrderType.Sheep,
-      fulfilledAt: new Date(fixedNow + 30 * 60 * 1000),
+      fulfilledAt: new Date(fixedNow + BASE_TIME_MS * 2),
     });
     expect(result.type).toBe(EOrderType.Sheep);
     expect(result.userId).toBe('user-1');
@@ -63,7 +66,7 @@ describe('CreateSheepOrder', () => {
     nowSpy.mockRestore();
   });
 
-  it('should use base 15 minutes when TIME_RATE is 1', async () => {
+  it('should use base time from config when TIME_RATE is 1', async () => {
     const fixedNow = new Date('2026-01-01T00:00:00.000Z').getTime();
     const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(fixedNow);
 
@@ -79,7 +82,7 @@ describe('CreateSheepOrder', () => {
       userId: 'user-2',
       type: EOrderType.Sheep,
       createdAt: new Date(fixedNow),
-      fulfilledAt: new Date(fixedNow + 15 * 60 * 1000),
+      fulfilledAt: new Date(fixedNow + BASE_TIME_MS * 1),
     });
 
     await useCase.execute('token-2');
@@ -87,7 +90,7 @@ describe('CreateSheepOrder', () => {
     expect(createOrder).toHaveBeenCalledWith({
       userId: 'user-2',
       type: EOrderType.Sheep,
-      fulfilledAt: new Date(fixedNow + 15 * 60 * 1000),
+      fulfilledAt: new Date(fixedNow + BASE_TIME_MS * 1),
     });
 
     nowSpy.mockRestore();

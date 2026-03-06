@@ -2,10 +2,17 @@ import { ClientSession } from 'mongoose';
 import { CONFIGURATIONS } from '../../../domain/constants/configurations.constants';
 import { SheepRepository } from '../../../data/repositories/sheep/sheep.repository';
 import { ERarity } from '../../../domain/sheep.interface';
-import { GenerateSheepService } from './generate-sheep.service';
+import {
+  GenerateSheepService,
+  MAX_ROLL,
+  TOTAL_STATS,
+} from './generate-sheep.service';
 
-const { minStatTotal, maxStatTotal } =
+const { minStatIndividual, maxStatIndividual } =
   CONFIGURATIONS.sheepGeneration.statConfig;
+const { rarityConfig } = CONFIGURATIONS.sheepGeneration;
+const minStatTotal = TOTAL_STATS * minStatIndividual;
+const maxStatTotal = TOTAL_STATS * maxStatIndividual;
 const statRange = maxStatTotal - minStatTotal;
 
 describe('GenerateSheepService', () => {
@@ -22,24 +29,21 @@ describe('GenerateSheepService', () => {
   });
 
   describe('rarity based on roll', () => {
-    const rarityBoundaryCases =
-      CONFIGURATIONS.sheepGeneration.rarityConfig.flatMap(
-        ({ rarity, minRoll }, i) => {
-          const maxRoll =
-            i === 0
-              ? 999
-              : CONFIGURATIONS.sheepGeneration.rarityConfig[i - 1].minRoll - 1;
-          return [
-            [minRoll, rarity],
-            [maxRoll, rarity],
-          ] as [number, ERarity][];
-        },
-      );
+    const rarityBoundaryCases = rarityConfig.flatMap(
+      ({ rarity, minRoll }, i) => {
+        const maxRollForRarity =
+          i === 0 ? MAX_ROLL - 1 : rarityConfig[i - 1].minRoll - 1;
+        return [
+          [minRoll, rarity],
+          [maxRollForRarity, rarity],
+        ] as [number, ERarity][];
+      },
+    );
 
     it.each(rarityBoundaryCases)(
       'roll %i should yield rarity %s',
       async (roll, expectedRarity) => {
-        jest.spyOn(Math, 'random').mockReturnValue(roll / 1000);
+        jest.spyOn(Math, 'random').mockReturnValue(roll / MAX_ROLL);
         createSheep.mockResolvedValue({});
 
         await service.execute('user-1');
@@ -52,10 +56,10 @@ describe('GenerateSheepService', () => {
 
   describe('stat distribution', () => {
     it('should distribute statTotal across the 6 stats so their sum equals the computed statTotal', async () => {
-      const roll = 600;
+      const roll = 60;
       let callCount = 0;
       jest.spyOn(Math, 'random').mockImplementation(() => {
-        if (callCount++ === 0) return 0.6; // roll = Math.floor(0.6 * 1000) = 600
+        if (callCount++ === 0) return 0.6; // roll = Math.floor(0.6 * 100) = 60
         return 0.5;
       });
       createSheep.mockResolvedValue({});
@@ -74,7 +78,7 @@ describe('GenerateSheepService', () => {
         params.accuracy;
 
       const expectedStatTotal =
-        minStatTotal + Math.floor((roll * statRange) / 999);
+        minStatTotal + Math.floor((roll * statRange) / (MAX_ROLL - 1));
       expect(total).toBe(expectedStatTotal);
     });
 
@@ -96,8 +100,8 @@ describe('GenerateSheepService', () => {
       expect(total).toBe(minStatTotal);
     });
 
-    it(`should yield statTotal of ${maxStatTotal} when roll is 999`, async () => {
-      jest.spyOn(Math, 'random').mockReturnValue(0.999);
+    it(`should yield statTotal of ${maxStatTotal} when roll is ${MAX_ROLL - 1}`, async () => {
+      jest.spyOn(Math, 'random').mockReturnValue((MAX_ROLL - 1) / MAX_ROLL);
       createSheep.mockResolvedValue({});
 
       await service.execute('user-1');
@@ -114,7 +118,7 @@ describe('GenerateSheepService', () => {
       expect(total).toBe(maxStatTotal);
     });
 
-    it('each stat should be >= 0', async () => {
+    it(`each stat should be between ${minStatIndividual} and ${maxStatIndividual}`, async () => {
       createSheep.mockResolvedValue({});
 
       await service.execute('user-1');
@@ -128,8 +132,35 @@ describe('GenerateSheepService', () => {
         'evasion',
         'accuracy',
       ]) {
-        expect(params[stat]).toBeGreaterThanOrEqual(0);
+        expect(params[stat]).toBeGreaterThanOrEqual(minStatIndividual);
+        expect(params[stat]).toBeLessThanOrEqual(maxStatIndividual);
       }
+    });
+
+    describe('stat disparity', () => {
+      it('should distribute stats equally when statDisparityRate is 0', async () => {
+        const roll = 60;
+        let callCount = 0;
+        jest.spyOn(Math, 'random').mockImplementation(() => {
+          if (callCount++ === 0) return 0.6; // roll = Math.floor(0.6 * 100) = 60
+          return 0.5; // weights irrelevant at rate=0
+        });
+        createSheep.mockResolvedValue({});
+
+        await service.execute('user-1');
+
+        const [params] = createSheep.mock.calls[0] as [Record<string, number>];
+        const stats = [
+          params.hitPoint,
+          params.attack,
+          params.defense,
+          params.speed,
+          params.evasion,
+          params.accuracy,
+        ];
+        // With rate=0 all stats are floor(equalShare), diff of at most 1 due to rounding
+        expect(Math.max(...stats) - Math.min(...stats)).toBeLessThanOrEqual(1);
+      });
     });
   });
 

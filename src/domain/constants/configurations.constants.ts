@@ -6,8 +6,9 @@ export interface IRarityConfig {
 }
 
 export interface IStatConfig {
-  minStatTotal: number;
-  maxStatTotal: number;
+  minStatIndividual: number;
+  maxStatIndividual: number;
+  statDispersionRate: number;
 }
 
 export interface ISheepOrderCostConfig {
@@ -25,7 +26,6 @@ export interface ICostConfig {
 }
 
 export interface ISheepGenerationConfig {
-  maxRoll: number;
   rarityConfig: IRarityConfig[];
   statConfig: IStatConfig;
 }
@@ -56,17 +56,17 @@ export const CONFIGURATIONS: IConfigurations = {
     },
   },
   sheepGeneration: {
-    maxRoll: 1000,
     rarityConfig: [
-      { rarity: ERarity.Legendary, minRoll: 990 },
-      { rarity: ERarity.Epic, minRoll: 900 },
-      { rarity: ERarity.Rare, minRoll: 750 },
-      { rarity: ERarity.Uncommon, minRoll: 400 },
+      { rarity: ERarity.Legendary, minRoll: 99 },
+      { rarity: ERarity.Epic, minRoll: 90 },
+      { rarity: ERarity.Rare, minRoll: 75 },
+      { rarity: ERarity.Uncommon, minRoll: 40 },
       { rarity: ERarity.Common, minRoll: 0 },
     ],
     statConfig: {
-      minStatTotal: 500,
-      maxStatTotal: 2500,
+      minStatIndividual: 50,
+      maxStatIndividual: 500,
+      statDispersionRate: 25,
     },
   },
   user: {
