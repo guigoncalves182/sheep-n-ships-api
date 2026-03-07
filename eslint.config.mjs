@@ -26,6 +26,18 @@ export default tseslint.config(
   },
   {
     rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['src/*'],
+              message:
+                'Use relative imports instead of src/* to avoid runtime resolution issues in production.',
+            },
+          ],
+        },
+      ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
