@@ -5,6 +5,7 @@ import { AuthModule } from './auth.module';
 import { UserModule } from './user.module';
 import { SystemController } from '../../../presentation/system/system.controller';
 import { SheepModule } from './sheep.module';
+import { OrderModule } from './order.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SheepModule } from './sheep.module';
     AuthModule,
     UserModule,
     SheepModule,
+    OrderModule,
   ],
   controllers: [SystemController],
 })

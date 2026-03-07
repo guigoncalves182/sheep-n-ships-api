@@ -3,23 +3,17 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { ERarity } from '../../domain/sheep.interface';
-import { ClaimSheep } from '../../usecases/claim-sheep/claim-sheep.usecase';
 import { GetUserSheepsUseCase } from '../../usecases/get-user-sheeps/get-user-sheeps.usecase';
 import { SheepController } from './sheep.controller';
 
 describe('SheepController', () => {
   let app: INestApplication;
-  const executeClaimSheep = jest.fn();
   const executeGetUserSheeps = jest.fn();
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [SheepController],
       providers: [
-        {
-          provide: ClaimSheep,
-          useValue: { execute: executeClaimSheep },
-        },
         {
           provide: GetUserSheepsUseCase,
           useValue: { execute: executeGetUserSheeps },
@@ -54,9 +48,12 @@ describe('SheepController', () => {
     ]);
 
     const httpServer = app.getHttpServer() as App;
-    const response = await request(httpServer).get('/sheep').expect(200);
+    const response = await request(httpServer)
+      .get('/sheep')
+      .set('authorization', 'Bearer token-abc')
+      .expect(200);
 
-    expect(executeGetUserSheeps).toHaveBeenCalledTimes(1);
+    expect(executeGetUserSheeps).toHaveBeenCalledWith('token-abc');
     expect(response.body).toEqual([
       {
         userId: 'user-1',
@@ -71,34 +68,12 @@ describe('SheepController', () => {
     ]);
   });
 
-  it('POST /sheep/claim should call use case with bearer token and return payload', async () => {
-    executeClaimSheep.mockResolvedValue({
-      userId: 'user-1',
-      rarity: ERarity.Rare,
-      hitPoint: 20,
-      attack: 10,
-      defense: 8,
-      speed: 7,
-      evasion: 6,
-      accuracy: 5,
-    });
+  it('GET /sheep should call use case with undefined token when header is missing', async () => {
+    executeGetUserSheeps.mockResolvedValue([]);
 
     const httpServer = app.getHttpServer() as App;
-    const response = await request(httpServer)
-      .post('/sheep/claim/order-123')
-      .set('authorization', 'Bearer token-abc')
-      .expect(201);
+    await request(httpServer).get('/sheep').expect(200);
 
-    expect(executeClaimSheep).toHaveBeenCalledWith('token-abc', 'order-123');
-    expect(response.body).toEqual({
-      userId: 'user-1',
-      rarity: ERarity.Rare,
-      hitPoint: 20,
-      attack: 10,
-      defense: 8,
-      speed: 7,
-      evasion: 6,
-      accuracy: 5,
-    });
+    expect(executeGetUserSheeps).toHaveBeenCalledWith(undefined);
   });
 });
