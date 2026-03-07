@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Connection } from 'mongoose';
-import { GenerateSheepService } from 'src/app/services/generate-sheep/generate-sheep.service';
+import { GenerateSheepService } from '../../app/services/generate-sheep/generate-sheep.service';
 import { DecodeTokenService } from '../../app/services/decode-token/decode-token.service';
 import { OrderRepository } from '../../data/repositories/order/order.repository';
 import { ERarity } from '../../domain/sheep.interface';
